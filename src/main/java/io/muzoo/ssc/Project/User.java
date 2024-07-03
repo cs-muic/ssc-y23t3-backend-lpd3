@@ -5,11 +5,12 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Setter
 @ToString
-
+@Table(name="user")
 public class User {
     @Id private Long id;
     private String firstName;
