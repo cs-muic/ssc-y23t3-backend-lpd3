@@ -1,4 +1,4 @@
-package io.muzoo.ssc.webapp.Project;
+package io.muzoo.ssc.Project;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package io.muzoo.ssc.webapp.Project;
+package io.muzoo.ssc.Project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
