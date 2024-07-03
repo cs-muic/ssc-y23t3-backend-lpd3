@@ -48,4 +48,21 @@ public class AuthController {
                 saveUser.getEmail()
         );
     }
+
+    record LoginRequest(String email,String password){}
+    record LoginResponse(Long id,
+                         @JsonProperty("first_name") String firstName,
+                         @JsonProperty("last_name") String lastName,
+                         String email){}
+
+    @PostMapping(value = "/login")
+    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+        User loginUser = authService.login(loginRequest.email(), loginRequest.password());
+        return new LoginResponse(
+                loginUser.getId(),
+                loginUser.getFirstName(),
+                loginUser.getLastName(),
+                loginUser.getEmail()
+        );
+    }
 }
