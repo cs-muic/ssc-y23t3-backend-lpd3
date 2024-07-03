@@ -1,4 +1,4 @@
-package io.muzoo.ssc.Project;
+package io.muzoo.ssc.Project.data;
 
 import lombok.Getter;
 import lombok.Setter;
