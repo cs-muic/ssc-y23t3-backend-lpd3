@@ -108,4 +108,23 @@ public class AuthController {
         return new ForgetResponse("success");
     }
 
+    record ResetRequest(String token, String password, @JsonProperty(value = "password_confirm") String passwordConfirm){}
+    record ResetResponse(String message) {}
+    @PostMapping(value = "/reset")
+    public ResetResponse reset(@RequestBody ResetRequest resetRequest){
+        authService.reset(resetRequest.token(), resetRequest.password, resetRequest.passwordConfirm());
+
+        return new ResetResponse("success");
+    }
+
+    record TwoFactorRequest(Long id, String secret, String code){}
+    record TwoFactorResponse(String token) {}
+
+    @PostMapping(value = "/two-factor")
+    public TwoFactorResponse twoFactor(@RequestBody TwoFactorRequest twoFactorRequest){
+        var login = authService.twoFactorLogin(twoFactorRequest.id(), twoFactorRequest.secret(), twoFactorRequest.code());
+
+        return new TwoFactorResponse(login.getAccessToken(),getToken());
+    }
+
 }
