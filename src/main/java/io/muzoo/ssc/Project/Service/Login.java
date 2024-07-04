@@ -1,31 +1,53 @@
 package io.muzoo.ssc.Project.Service;
 
+import com.google.common.io.BaseEncoding;
 import io.muzoo.ssc.Project.data.Token;
 import lombok.Getter;
 
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+
 public class Login {
     @Getter
-    private final Token accessToken;
+    private final Jwt accessToken;
     @Getter
-    private final Token refreshToken;
+    private final Jwt refreshToken;
+    @Getter
+    private final String otpSecret;
+    @Getter
+    private final String otpUrl;
 
     private static final long ACCESS_TOKEN_VALIDITY = 1L;
     private static final long REFRESH_TOKEN_VALIDITY = 1L;
-    private Login(Token accessToken, Token refreshToken){
+    private Login(Jwt accessToken, Jwt refreshToken, String otpSecret, String otpUrl){
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.otpSecret = otpSecret;
+        this.otpUrl = otpUrl;
     }
     public static Login of(Long userId, String accessSecret, String refreshSecret){
+        var otpSecret = generateOtpSecret();
         return new Login(
-                Token.of(userId,ACCESS_TOKEN_VALIDITY,accessSecret),
-                Token.of(userId,REFRESH_TOKEN_VALIDITY,refreshSecret)
-        );
+                Jwt.of(userId,ACCESS_TOKEN_VALIDITY,accessSecret),
+                Jwt.of(userId,REFRESH_TOKEN_VALIDITY,refreshSecret),
+                otpSecret,
+                getOtpUrl(otpSecret));
+    }
+    public static Login of(Long userId, String accessSecret, Jwt refreshToken){
+        var otpSecret = generateOtpSecret();
+        return new Login(
+                Jwt.of(userId,ACCESS_TOKEN_VALIDITY,accessSecret),
+                refreshToken,
+                otpSecret,
+                getOtpUrl(otpSecret));
+    }
+    private static String generateOtpSecret(){
+        var uuid = UUID.randomUUID().toString();
+        return BaseEncoding.base32().encode(uuid.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static Login of(Long userId, String accessSecret, Token refreshToken){
-        return new Login(
-                Token.of(userId,ACCESS_TOKEN_VALIDITY,accessSecret),
-                refreshToken
-        );
+    private static String getOtpUrl(String otpSecret){
+        var appName = "My%20App";
+        return String.format("otpauth://totp/%s:Secret?secret=%s&issuer=%s", appName, otpSecret, appName);
     }
 }

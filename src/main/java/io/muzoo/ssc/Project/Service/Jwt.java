@@ -43,6 +43,36 @@ public class Jwt {
 
         return new Jwt(token, userId, issuedAt, expiration);
     }
+    public static Jwt of(Long userId, Long validityInMinutes, String secretKey) {
+        Instant now = Instant.now();
+        LocalDateTime issuedAt = LocalDateTime.ofInstant(now, ZoneId.systemDefault());
+        LocalDateTime expiration = LocalDateTime.ofInstant(now.plusSeconds(validityInMinutes * 60), ZoneId.systemDefault());
+
+        String jwtToken = Jwts.builder()
+                .claim("user_id", userId)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusSeconds(validityInMinutes * 60)))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
+        return new Jwt(jwtToken, userId, issuedAt, expiration);
+    }
+
+    public static Jwt of(String token, String secretKey) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+
+        Long userId = Long.parseLong(claims.getSubject());
+        Instant issuedAtInstant = claims.getIssuedAt().toInstant();
+        Instant expirationInstant = claims.getExpiration().toInstant();
+
+        LocalDateTime issuedAt = LocalDateTime.ofInstant(issuedAtInstant, ZoneId.systemDefault());
+        LocalDateTime expiration = LocalDateTime.ofInstant(expirationInstant, ZoneId.systemDefault());
+
+        return new Jwt(token, userId, issuedAt, expiration);
+    }
 
     public static String createToken(Long userId, String secret, long expirationTimeInMillis) {
         return Jwts.builder()
