@@ -1,15 +1,19 @@
 package io.muzoo.ssc.Project.Service;
 
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.muzoo.ssc.Project.data.Token;
 import io.muzoo.ssc.Project.data.User;
 import io.muzoo.ssc.Project.data.UserRepo;
+import io.muzoo.ssc.Project.error.InvalidCredentialsError;
+import io.muzoo.ssc.Project.error.UnauthenticatedError;
+import io.muzoo.ssc.Project.error.UserNotFoundError;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Objects;
 
 @Service
 public class AuthService {
@@ -39,25 +43,45 @@ public class AuthService {
     }
 
     public Login login(String email, String password) {
-        User findEmail = userRepo.findByEmail(email);
-        if (findEmail == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        var user = userRepo.findByEmail(email)
+                .orElseThrow(InvalidCredentialsError::new);
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new InvalidCredentialsError();
         }
-        if (!passwordEncoder.matches(password, findEmail.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password");
-        }
-        return Login.of(findEmail.getId(),accessTokenSecret,refreshTokenSecret);
+
+        var login = Login.of(user.getId(), accessTokenSecret, refreshTokenSecret);
+        var refreshJwt = login.getRefreshToken();
+
+        user.addToken(new Token(refreshJwt.getToken(),refreshJwt.getIssuedAt(), refreshJwt.getExpiration()));
+        userRepo.save(user);
+
+        return login;
     }
 
     public User getUserFromToken(String token) {
-        return userRepo.findById(Token.from(token, accessTokenSecret))
+        return userRepo.findById(Jwt.from(token, accessTokenSecret).getUserId())
                 .orElseThrow(UserNotFoundError::new);
     }
 
     public Login refreshAccess(String refreshToken) {
-        var userId = Token.from(refreshToken, refreshTokenSecret);
+        var refreshJwt = Jwt.from(refreshToken, refreshTokenSecret);
 
-        return Login.of(userId, accessTokenSecret, Token.of(refreshToken));
+        var user = userRepo.findByIdAndTokenRefreshTokenAndTokensExpiredAtGreaterThan(refreshJwt.getUserId(),refreshJwt.getToken(),refreshJwt.getExpiration())
+                .orElseThrow(UnauthenticatedError::new);
+
+        return Login.of(refreshJwt.getUserId(), accessTokenSecret, Token.of(refreshToken));
+    }
+
+    public Boolean logout(String refreshToken){
+        var refreshJwt = Jwt.from(refreshToken, refreshTokenSecret);
+        var user = userRepo.findById(refreshJwt.getUserId())
+                .orElseThrow(UnauthenticatedError::new);
+        var tokenIsRemoved= user.removeTokenIf(token -> Objects.equals(token.refreshToken(), refreshToken));
+
+        if (tokenIsRemoved)
+            userRepo.save(user);
+
+        return tokenIsRemoved;
     }
 }
 

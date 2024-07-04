@@ -1,4 +1,4 @@
-package io.muzoo.ssc.Project.Service;
+package io.muzoo.ssc.Project.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;

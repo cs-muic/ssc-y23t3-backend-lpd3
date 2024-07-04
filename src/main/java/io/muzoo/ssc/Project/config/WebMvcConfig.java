@@ -1,6 +1,6 @@
 package io.muzoo.ssc.Project.config;
 
-import io.muzoo.ssc.Project.Service.AuthorizationInterceptor;
+import io.muzoo.ssc.Project.interceptor.AuthorizationInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

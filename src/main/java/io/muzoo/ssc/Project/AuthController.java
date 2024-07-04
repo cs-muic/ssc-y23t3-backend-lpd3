@@ -87,6 +87,7 @@ public class AuthController {
     record LogoutResponse(String message){}
     @PostMapping(value = "/logout")
     public LogoutResponse logout(@CookieValue("refresh_token") String refreshToken, HttpServletResponse response){
+        authService.logout(refreshToken);
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
         cookie.setHttpOnly(true);

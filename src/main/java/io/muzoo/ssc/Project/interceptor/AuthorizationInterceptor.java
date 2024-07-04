@@ -1,5 +1,7 @@
-package io.muzoo.ssc.Project.Service;
+package io.muzoo.ssc.Project.interceptor;
 
+import io.muzoo.ssc.Project.Service.AuthService;
+import io.muzoo.ssc.Project.error.NoBearerTokenError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         String authorizationHeader = request.getHeader("Authorization");
 
         if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
-            throw new NoBearerTokenError();
 
         request.setAttribute("user",authService.getUserFromToken(authorizationHeader.substring(7)));
 

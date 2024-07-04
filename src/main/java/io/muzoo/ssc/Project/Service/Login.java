@@ -1,5 +1,6 @@
 package io.muzoo.ssc.Project.Service;
 
+import io.muzoo.ssc.Project.data.Token;
 import lombok.Getter;
 
 public class Login {

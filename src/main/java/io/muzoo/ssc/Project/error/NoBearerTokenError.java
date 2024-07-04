@@ -1,4 +1,4 @@
-package io.muzoo.ssc.Project.Service;
+package io.muzoo.ssc.Project.error;
 
 public class NoBearerTokenError extends RuntimeException {
     public NoBearerTokenError() {
