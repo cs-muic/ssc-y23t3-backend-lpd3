@@ -96,5 +96,16 @@ public class AuthController {
 
         return new LogoutResponse("success");
     }
+    record ForgotRequest(String email){}
+    record ForgetResponse(String message){ }
+
+    @PostMapping(value = "/forgot")
+    public ForgetResponse forget(@RequestBody ForgotRequest forgotRequest, HttpServletRequest request){
+        var originalUrl = request.getHeader("Original");
+
+        authService.forgot(forgotRequest.email(), originalUrl);
+
+        return new ForgetResponse("success");
+    }
 
 }

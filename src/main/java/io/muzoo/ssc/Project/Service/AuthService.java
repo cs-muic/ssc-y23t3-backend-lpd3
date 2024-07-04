@@ -1,6 +1,7 @@
 package io.muzoo.ssc.Project.Service;
 
 
+import io.muzoo.ssc.Project.data.PasswordRecovery;
 import io.muzoo.ssc.Project.data.Token;
 import io.muzoo.ssc.Project.data.User;
 import io.muzoo.ssc.Project.data.UserRepo;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -82,6 +84,15 @@ public class AuthService {
             userRepo.save(user);
 
         return tokenIsRemoved;
+    }
+
+    public void forgot(String email, String originalUrl) {
+        var token = UUID.randomUUID().toString().replace("-","");
+        var user = userRepo.findByEmail(email)
+                .orElseThrow(UserNotFoundError::new);
+        user.addPassswordRecovery(new PasswordRecovery(token));
+
+        userRepo.save(user);
     }
 }
 
