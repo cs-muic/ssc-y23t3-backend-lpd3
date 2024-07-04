@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.web.saml2.LogoutResponseDsl;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -81,7 +82,18 @@ public class AuthController {
     @PostMapping(value = "/refresh")
     public RefreshResponse refresh(@CookieValue("refresh_token") String refreshToken) {
         return new RefreshResponse(authService.refreshAccess(refreshToken).getAccessToken().getToken());
+    }
 
+    record LogoutResponse(String message){}
+    @PostMapping(value = "/logout")
+    public LogoutResponse logout(@CookieValue("refresh_token") String refreshToken, HttpServletResponse response){
+        Cookie cookie = new Cookie("refresh", null);
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+
+        response.addCookie(cookie);
+
+        return new LogoutResponse("success");
     }
 
 }
