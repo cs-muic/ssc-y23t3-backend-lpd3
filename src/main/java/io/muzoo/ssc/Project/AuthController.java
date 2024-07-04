@@ -5,6 +5,7 @@ import io.muzoo.ssc.Project.Service.AuthService;
 import io.muzoo.ssc.Project.data.User;
 import io.muzoo.ssc.Project.data.UserRepo;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -65,4 +66,22 @@ public class AuthController {
         response.addCookie(cookie);
         return new LoginResponse(login.getAccessToken().getToken());
     }
+
+    record UserResponse(Long id, @JsonProperty("first_name") String firstName, @JsonProperty("last_name") String lastname, String email){}
+    @GetMapping(value = "/user")
+    public UserResponse user(HttpServletRequest request){
+        var user = (User) request.getAttribute("user");
+
+        return new UserResponse(user.getId(),user.getFirstName(),user.getLastName(), user.getEmail());
+    }
+
+    record RefreshResponse(String token){
+
+    }
+    @PostMapping(value = "/refresh")
+    public RefreshResponse refresh(@CookieValue("refresh_token") String refreshToken) {
+        return new RefreshResponse(authService.refreshAccess(refreshToken).getAccessToken().getToken());
+
+    }
+
 }

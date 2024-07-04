@@ -1,6 +1,8 @@
 package io.muzoo.ssc.Project.Service;
 
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.muzoo.ssc.Project.data.User;
 import io.muzoo.ssc.Project.data.UserRepo;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +47,17 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password");
         }
         return Login.of(findEmail.getId(),accessTokenSecret,refreshTokenSecret);
+    }
+
+    public User getUserFromToken(String token) {
+        return userRepo.findById(Token.from(token, accessTokenSecret))
+                .orElseThrow(UserNotFoundError::new);
+    }
+
+    public Login refreshAccess(String refreshToken) {
+        var userId = Token.from(refreshToken, refreshTokenSecret);
+
+        return Login.of(userId, accessTokenSecret, Token.of(refreshToken));
     }
 }
 
