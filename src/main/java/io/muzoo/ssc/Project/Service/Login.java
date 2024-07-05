@@ -5,22 +5,11 @@ import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import lombok.Getter;
 import java.util.UUID;
 
-<<<<<<< HEAD
 @Getter
 public class Login {
     private final Jwt accessToken;
     private final Jwt refreshToken;
     private final String otpSecret;
-=======
-public class Login {
-    @Getter
-    private final Jwt accessToken;
-    @Getter
-    private final Jwt refreshToken;
-    @Getter
-    private final String otpSecret;
-    @Getter
->>>>>>> 9b7b3ad516e5445ec9243828988cd6bf31a67a4f
     private final String otpUrl;
 
     private static final long ACCESS_TOKEN_VALIDITY = 1L;
