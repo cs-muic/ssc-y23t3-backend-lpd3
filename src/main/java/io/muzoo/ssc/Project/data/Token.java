@@ -7,6 +7,8 @@ import lombok.Getter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
@@ -14,23 +16,23 @@ import java.util.Date;
 public class Token {
     @Getter
     private final String token;
-    private final Date issuedAt;
-    private final Date expiration;
+    private final LocalDateTime issuedAt;
+    private final LocalDateTime expiration;
 
-    public Token(String token, Date issuedAt, Date expiration) {
+    public Token(String token, LocalDateTime issuedAt, LocalDateTime expiration) {
         this.token = token;
         this.issuedAt = issuedAt;
         this.expiration = expiration;
     }
     public static Token of(Long userId, Long validityInminutes, String secretKey){
         var issueDate = Instant.now();
-        Date issuedAt = Date.from(issueDate);
-        Date expiration = Date.from(issueDate.plus(validityInminutes, ChronoUnit.MINUTES));
+        LocalDateTime issuedAt = LocalDateTime.ofInstant(issueDate, ZoneId.systemDefault());
+        LocalDateTime expiration = issuedAt.plus(validityInminutes, ChronoUnit.MINUTES);
 
         String jwtToken = Jwts.builder()
                 .claim("user_id", userId)
-                .setIssuedAt(issuedAt)
-                .setExpiration(expiration)
+                .setIssuedAt(Date.from(issueDate))
+                .setExpiration(Date.from(issueDate.plus(validityInminutes, ChronoUnit.MINUTES)))
                 .signWith(SignatureAlgorithm.HS256, Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8)))
                 .compact();
         return new Token(jwtToken, issuedAt, expiration);
@@ -51,10 +53,10 @@ public class Token {
         return this.token;
     }
 
-    public Date getIssuedAt() {
+    public LocalDateTime getIssuedAt() {
         return this.issuedAt;
     }
-    public Date getExpiration() {
+    public LocalDateTime getExpiration() {
         return this.expiration;
     }
 }

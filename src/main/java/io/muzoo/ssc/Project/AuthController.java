@@ -124,7 +124,7 @@ public class AuthController {
     public TwoFactorResponse twoFactor(@RequestBody TwoFactorRequest twoFactorRequest){
         var login = authService.twoFactorLogin(twoFactorRequest.id(), twoFactorRequest.secret(), twoFactorRequest.code());
 
-        return new TwoFactorResponse(login.getAccessToken(),getToken());
+        return new TwoFactorResponse(login.getAccessToken().getToken());
     }
 
 }

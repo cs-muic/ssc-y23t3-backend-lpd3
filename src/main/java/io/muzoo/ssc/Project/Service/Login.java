@@ -35,7 +35,7 @@ public class Login {
                 Jwt.of(userId,ACCESS_TOKEN_VALIDITY,accessSecret),
                 Jwt.of(userId,REFRESH_TOKEN_VALIDITY,refreshSecret),
                 otpSecret,
-                otpUrl;
+                otpUrl);
     }
     public static Login of(Long userId, String accessSecret, Jwt refreshToken, Boolean generateOtp){
         String otpSecret = null;
@@ -48,7 +48,7 @@ public class Login {
                 Jwt.of(userId,ACCESS_TOKEN_VALIDITY,accessSecret),
                 refreshToken,
                 otpSecret,
-                otpUrl;
+                otpUrl);
     }
     private static String generateOtpSecret(){
         var uuid = UUID.randomUUID().toString();
