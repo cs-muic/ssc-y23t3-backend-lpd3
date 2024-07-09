@@ -18,7 +18,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/hello", "/api/register", "/api/login").permitAll()  // No authentication required
+                .requestMatchers("/api/hello", "/api/register", "/api/login","/api/user","/api/refresh","/api/logout","/api/forgot","/api/reset","/api/two-factor").permitAll()  // No authentication required
                 .anyRequest().authenticated()  // All other requests need authentication
         );
         return http.build();
