@@ -22,6 +22,11 @@ public class CustomerController {
         return customerservice.existcustomer(customerdto);
     }
 
+    @PostMapping(path = "/getcustomer")
+    public CustomerDTO getCustomer(@RequestBody CustomerDTO customerdto){
+        return customerservice.getCustomer(customerdto);
+    }
+
     @PostMapping(path = "/save")
     public String saveCustomer(@RequestBody CustomerSaveDTO customerdto){
         return customerservice.addCustomer(customerdto);
@@ -42,6 +47,4 @@ public class CustomerController {
         customerservice.deletecustomer(id);
         return "deleted";
     }
-
-
 }
